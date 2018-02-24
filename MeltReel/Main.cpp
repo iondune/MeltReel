@@ -46,9 +46,21 @@ void WriteBlackClip()
 	Line(2, "<property name='mlt_type'>producer</property>");
 	Line(2, "<property name='length'>15000</property>");
 	Line(2, "<property name='eof'>pause</property>");
-	Line(2, "<property name='resource'>black</property>");
+	Line(2, "<property name='resource'>&lt;producer&gt;</property>");
 	Line(2, "<property name='aspect_ratio'>1</property>");
-	Line(2, "<property name='mlt_service'>colour</property>");
+	Line(2, "<property name='mlt_service'>noise</property>");
+	Line(2, "<filter id='zeroVolume'>");
+	Line(3, "<property name='window'>75</property>");
+	Line(3, "<property name='max_gain'>20dB</property>");
+	Line(3, "<property name='mlt_type'>filter</property>");
+	Line(3, "<property name='mlt_service'>volume</property>");
+	Line(3, "<property name='gain'>0</property>");
+	Line(3, "<filter id='zeroColor'>");
+	Line(4, "<property name='gamma'>0</property>");
+	Line(4, "<property name='mlt_type'>filter</property>");
+	Line(4, "<property name='mlt_service'>gamma</property>");
+	Line(3, "</filter>");
+	Line(2, "</filter>");
 	Line(1, "</producer>");
 }
 
