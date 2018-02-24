@@ -75,7 +75,7 @@ void WriteSourceClip(int const id)
 void WriteTransitionOut(int const id, int const source, int const frame)
 {
 	Line(1, tfm::format("<tractor id='%dout' in='0' out='24'>", id));
-	Line(2, tfm::format("<track producer='source%d' in='%d' out='%d'/>", source, frame, frame+24));
+	Line(2, tfm::format("<track producer='source%d' in='%d' out='%d'/>", source, frame, frame + 24));
 	Line(2, "<track producer='black' in='0' out='24'/>");
 	Line(2, tfm::format("<transition id='%dout_luma' out='24'>", id));
 	Line(3, "<property name='a_track'>0</property>");
@@ -98,7 +98,7 @@ void WriteTransitionIn(int const id, int const source, int const frame)
 {
 	Line(1, tfm::format("<tractor id='%din' in='0' out='24'>", id));
 	Line(2, "<track producer='black' in='0' out='24'/>");
-	Line(2, tfm::format("<track producer='source%d' in='%d' out='%d'/>", source, frame, frame+24));
+	Line(2, tfm::format("<track producer='source%d' in='%d' out='%d'/>", source, frame, frame + 24));
 	Line(2, tfm::format("<transition id='%din_luma' out='24'>", id));
 	Line(3, "<property name='a_track'>0</property>");
 	Line(3, "<property name='b_track'>1</property>");
@@ -165,22 +165,50 @@ int HMStoFrames(string const & s)
 	}
 }
 
+vector<Clip> ReadClipsFromFile()
+{
+	vector<Clip> clips;
+
+	ifstream input("clips.csv");
+	char const field_delim = '\t';
+
+	int index = 0;
+
+
+	for (string row; getline(input, row); )
+	{
+		vector<string> values;
+		istringstream ss(row);
+
+		for (string field; getline(ss, field, field_delim); )
+		{
+			values.push_back(field);
+		}
+
+		if (values.size() != 3)
+		{
+			cerr << "Malformed row at index " << index << endl;
+			continue;
+		}
+
+		Clip c;
+		c.Source = stoi(values[0]);
+		c.Start = HMStoFrames(values[1]);
+		c.End = HMStoFrames(values[2]);
+
+		clips.push_back(c);
+
+		index ++;
+	}
+
+	return clips;
+}
+
 int main()
 {
 	outfile.open("reel.xml");
 
-	Clip c1, c2;
-	c1.Source = 3;
-	c1.Start = HMStoFrames("1:28:59");
-	c1.End = HMStoFrames("1:29:06");
-
-	c2.Source = 4;
-	c2.Start = HMStoFrames("1:28:59");
-	c2.End = HMStoFrames("1:29:06");
-
-	vector<Clip> clips;
-	clips.push_back(c1);
-	clips.push_back(c2);
+	vector<Clip> clips = ReadClipsFromFile();
 
 	WriteHeader();
 	WriteBlackClip();
@@ -194,10 +222,6 @@ int main()
 		WriteTransitionIn(i, clip.Source, clip.Start);
 		WriteTransitionOut(i, clip.Source, clip.End - 24);
 	}
-
-	//WriteTransitionOut(0, 3, 103);
-	//WriteTransitionIn(1, 4, 0);
-
 
 	Line(1, "<playlist id='playlist0'>");
 	for (int i = 0; i < clips.size(); ++ i)
@@ -216,53 +240,4 @@ int main()
 	Line("</mlt>");
 
 	return 0;
-	/*
-	ifstream input("clips.csv");
-	char const field_delim = '\t';
-
-	int last = 0;
-
-	for (string row; getline(input, row); )
-	{
-		vector<string> values;
-		istringstream ss(row);
-
-		for (string field; getline(ss, field, field_delim); )
-		{
-			values.push_back(field);
-		}
-
-		if (values.size() < 5)
-		{
-			continue;
-		}
-
-		string Name = values[5];
-
-		int table = FromHex(values[0]);
-		if (values.size() > 6)
-		{
-			Name += " : ";
-			Name += values[6];
-		}
-		EntranceTable.push_back(Name);
-
-		if (values.size() > 7)
-		{
-			int PlaceNumber = strtol(values[7].c_str(), nullptr, 10);
-			if (PlaceTable.find(PlaceNumber) != PlaceTable.end())
-			{
-				Log::Error("Place %d already in the table!", PlaceNumber);
-			}
-			else
-			{
-				PlaceTable[PlaceNumber] = Name;
-			}
-			PlaceNumTable.push_back(PlaceNumber);
-		}
-		else
-		{
-			PlaceNumTable.push_back(9999);
-		}
-	}*/
 }
