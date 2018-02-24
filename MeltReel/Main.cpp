@@ -165,11 +165,10 @@ int HMStoFrames(string const & s)
 	}
 }
 
-vector<Clip> ReadClipsFromFile()
+vector<Clip> ReadClipsFromFile(ifstream & input)
 {
 	vector<Clip> clips;
 
-	ifstream input("clips.csv");
 	char const field_delim = '\t';
 
 	int index = 0;
@@ -204,11 +203,38 @@ vector<Clip> ReadClipsFromFile()
 	return clips;
 }
 
-int main()
+int main(int argc, char ** argv)
 {
-	outfile.open("reel.xml");
+	string infileName, outfileName;
 
-	vector<Clip> clips = ReadClipsFromFile();
+	if (argc == 3)
+	{
+		infileName = argv[1];
+		outfileName = argv[2];
+	}
+	else
+	{
+		cerr << "Expected 2 arguments, found " << argc - 1 << "." << endl;
+		cerr << "usage: ./MeltReel <infile> <outfile>" << endl;
+		return 1;
+	}
+
+	ifstream input(infileName);
+	if (! input.is_open())
+	{
+		cerr << "Input file could not be opened: " << infileName << endl;
+		return 1;
+	}
+
+	outfile.open(outfileName);
+	if (! outfile.is_open())
+	{
+		cerr << "Output file could not be opened: " << outfileName << endl;
+		return 1;
+	}
+
+
+	vector<Clip> clips = ReadClipsFromFile(input);
 
 	WriteHeader();
 	WriteBlackClip();
