@@ -206,6 +206,12 @@ vector<Clip> ReadClipsFromFile(ifstream & input)
 		c.Start = HMStoFrames(values[1]);
 		c.End = HMStoFrames(values[2]);
 
+		if (c.Start > c.End)
+		{
+			swap(c.Start, c.End);
+			cerr << "Found record with mismatched times at index " << index << endl;
+		}
+
 		clips.push_back(c);
 
 		index ++;
