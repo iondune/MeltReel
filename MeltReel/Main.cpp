@@ -314,7 +314,7 @@ int main(int argc, char ** argv)
 		WriteTransitionIn(i, clip.Source, clip.Start);
 		WriteTransitionOut(i, clip.Source, clip.End - 24);
 
-		totalFrames += clip.End - clip.Start;
+		totalFrames += clip.End - clip.Start + 1;
 	}
 
 	Line(1, "<playlist id='playlist0'>");
