@@ -249,8 +249,15 @@ int main(int argc, char ** argv)
 
 	WriteHeader();
 	WriteBlackClip();
+	WriteSourceClip("p1");
+	WriteSourceClip("p2");
 	WriteSourceClip("p3");
 	WriteSourceClip("p4");
+	WriteSourceClip("p5");
+	WriteSourceClip("p6");
+	WriteSourceClip("p7");
+	WriteSourceClip("p8");
+	WriteSourceClip("p9");
 
 	int totalFrames = 0;
 
