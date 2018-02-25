@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -172,7 +173,9 @@ string FramestoHMS(int const Frames)
 	const int Seconds = Frames % (60 * frameRate) / frameRate;
 
 	stringstream res;
-	res << Hours << ":" << Minutes << ":" << Seconds;
+	res << setfill('0') << setw(2) << Hours << ":"
+		<< setfill('0') << setw(2) << Minutes << ":"
+		<< setfill('0') << setw(2) << Seconds;
 	return res.str();
 }
 
@@ -293,7 +296,7 @@ int main(int argc, char ** argv)
 	Line(1, "</tractor>");
 	Line("</mlt>");
 
-	cout << "Wrote a Melt configuration of duration " << FramestoHMS(totalFrames) << " (" << totalFrames << " frames)" << endl;
+	cout << "Wrote a Melt configuration of duration " << FramestoHMS(totalFrames) << " (" << totalFrames << " frames) with " << clips.size() << " clips." << endl;
 
 	return 0;
 }
