@@ -165,6 +165,17 @@ int HMStoFrames(string const & s)
 	}
 }
 
+string FramestoHMS(int const Frames)
+{
+	const int Hours = Frames / (60 * 60 * frameRate);
+	const int Minutes = Frames % (60 * 60 * frameRate) / (60 * frameRate);
+	const int Seconds = Frames % (60 * frameRate) / frameRate;
+
+	stringstream res;
+	res << Hours << ":" << Minutes << ":" << Seconds;
+	return res.str();
+}
+
 vector<Clip> ReadClipsFromFile(ifstream & input)
 {
 	vector<Clip> clips;
@@ -241,12 +252,16 @@ int main(int argc, char ** argv)
 	WriteSourceClip("p3");
 	WriteSourceClip("p4");
 
+	int totalFrames = 0;
+
 	for (int i = 0; i < clips.size(); ++ i)
 	{
 		auto clip = clips[i];
 
 		WriteTransitionIn(i, clip.Source, clip.Start);
 		WriteTransitionOut(i, clip.Source, clip.End - 24);
+
+		totalFrames += clip.End - clip.Start;
 	}
 
 	Line(1, "<playlist id='playlist0'>");
@@ -264,6 +279,8 @@ int main(int argc, char ** argv)
 	Line(2, "<track producer='playlist0'/>");
 	Line(1, "</tractor>");
 	Line("</mlt>");
+
+	cout << "Wrote a Melt configuration of duration " << FramestoHMS(totalFrames) << " (" << totalFrames << " frames)" << endl;
 
 	return 0;
 }
