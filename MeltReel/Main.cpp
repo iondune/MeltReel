@@ -64,18 +64,18 @@ void WriteBlackClip()
 	Line(1, "</producer>");
 }
 
-void WriteSourceClip(int const id)
+void WriteSourceClip(string const & source)
 {
-	Line(1, tfm::format("<producer id='source%d'>", id));
+	Line(1, tfm::format("<producer id='source_%s'>", source));
 	Line(2, "<property name='mlt_type'>producer</property>");
-	Line(2, tfm::format("<property name='resource'>../Raw/p%d.mkv</property>", id));
+	Line(2, tfm::format("<property name='resource'>../Raw/%s.mkv</property>", source));
 	Line(1, "</producer>");
 }
 
-void WriteTransitionOut(int const id, int const source, int const frame)
+void WriteTransitionOut(int const id, string const & source, int const frame)
 {
 	Line(1, tfm::format("<tractor id='%dout' in='0' out='24'>", id));
-	Line(2, tfm::format("<track producer='source%d' in='%d' out='%d'/>", source, frame, frame + 24));
+	Line(2, tfm::format("<track producer='source_%s' in='%d' out='%d'/>", source, frame, frame + 24));
 	Line(2, "<track producer='black' in='0' out='24'/>");
 	Line(2, tfm::format("<transition id='%dout_luma' out='24'>", id));
 	Line(3, "<property name='a_track'>0</property>");
@@ -94,11 +94,11 @@ void WriteTransitionOut(int const id, int const source, int const frame)
 	Line(1, "</tractor>");
 }
 
-void WriteTransitionIn(int const id, int const source, int const frame)
+void WriteTransitionIn(int const id, string const & source, int const frame)
 {
 	Line(1, tfm::format("<tractor id='%din' in='0' out='24'>", id));
 	Line(2, "<track producer='black' in='0' out='24'/>");
-	Line(2, tfm::format("<track producer='source%d' in='%d' out='%d'/>", source, frame, frame + 24));
+	Line(2, tfm::format("<track producer='source_%s' in='%d' out='%d'/>", source, frame, frame + 24));
 	Line(2, tfm::format("<transition id='%din_luma' out='24'>", id));
 	Line(3, "<property name='a_track'>0</property>");
 	Line(3, "<property name='b_track'>1</property>");
@@ -120,7 +120,7 @@ const int frameRate = 25;
 
 struct Clip
 {
-	int Source = -1;
+	string Source = "none";
 	int Start = -1;
 	int End = -1;
 };
@@ -191,7 +191,7 @@ vector<Clip> ReadClipsFromFile(ifstream & input)
 		}
 
 		Clip c;
-		c.Source = stoi(values[0]);
+		c.Source = values[0];
 		c.Start = HMStoFrames(values[1]);
 		c.End = HMStoFrames(values[2]);
 
@@ -238,8 +238,8 @@ int main(int argc, char ** argv)
 
 	WriteHeader();
 	WriteBlackClip();
-	WriteSourceClip(3);
-	WriteSourceClip(4);
+	WriteSourceClip("p3");
+	WriteSourceClip("p4");
 
 	for (int i = 0; i < clips.size(); ++ i)
 	{
@@ -255,7 +255,7 @@ int main(int argc, char ** argv)
 		auto clip = clips[i];
 
 		Line(2, tfm::format("<entry producer='%din' in='0' out='24'/>", i));
-		Line(2, tfm::format("<entry producer='source%d' in='%d' out='%d'/>", clip.Source, clip.Start + 24 + 1, clip.End - 24 - 1));
+		Line(2, tfm::format("<entry producer='source_%s' in='%d' out='%d'/>", clip.Source, clip.Start + 24 + 1, clip.End - 24 - 1));
 		Line(2, tfm::format("<entry producer='%dout' in='0' out='24'/>", i));
 	}
 	Line(1, "</playlist>");
