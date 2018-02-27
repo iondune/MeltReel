@@ -223,8 +223,12 @@ vector<Clip> ReadClipsFromFile(ifstream & input)
 	return clips;
 }
 
+const string version = "v0.0.1";
+
 int main(int argc, char ** argv)
 {
+	cout << "MeltReel " << version << endl;
+
 	string infileName, outfileName;
 
 	if (argc == 3)
